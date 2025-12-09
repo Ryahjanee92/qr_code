@@ -11,15 +11,12 @@ COPY requirements.txt ./
 
 # Install the Python packages specified in requirements.txt
 RUN useradd -m myuser && pip install --no-cache-dir -r requirements.txt && \
-    mkdir logs qr_codes && chown myuser:myuser logs qr_codes
+    mkdir -p logs qr_codes && chmod 777 logs qr_codes
 # Before copying the application code, create the logs and qr_codes directories
-# and ensure they are owned by the non-root user
+# with write permissions for all users (needed for Docker volume mounts)
 
 # Copy the rest of the application's source code into the container, setting ownership to 'myuser'
 COPY --chown=myuser:myuser . .
-
-# Switch to the 'myuser' user to run the application
-USER myuser
 
 # Use the Python interpreter as the entrypoint and the script as the first argument
 # This allows additional command-line arguments to be passed to the script via the docker run command
